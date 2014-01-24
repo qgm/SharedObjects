@@ -105,33 +105,58 @@ public class Client extends UnicastRemoteObject implements Client_itf {
     //    Interface to be used by the consistency protocol
     ////////////////////////////////////////////////////////////
 
+	 /////////////////////////////////////////////////////////////
+    //    Interface to be used by the consistency protocol
+    ////////////////////////////////////////////////////////////
+
 	// request a read lock from the server
 	public static Object lock_read(int id) {
-		Object o = new Object();
+		Object o = null;
+		try{
+			o = server.lock_read(id,client);
+		} catch (Exception e){
+			System.out.println("connexion error @lock_read");
+			e.printStackTrace();
+		}
 		return o;
 	}
-
 	// request a write lock from the server
 	public static Object lock_write (int id) {
-		Object o = new Object();
+		Object o = null;
+		try{
+		o = server.lock_write(id,client);
+		}
+		catch (Exception e){
+			System.out.println("connexion error @lock_write");
+			e.printStackTrace();
+		}
+		
 		return o;
 	}
 
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
-		Object o = new Object();
-		return o;
+		SharedObject so = null;
+		so = objectsTable.get(id); 
+		return so.reduce_lock();	
 	}
 
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
 		
+		SharedObject so = null;
+		so = objectsTable.get(id); 
+		so.invalidate_reader();
+	
 	}
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
-		Object o = new Object();
-		return o;
+		
+		SharedObject so;
+		so = objectsTable.get(id); 
+		return so.invalidate_writer();
+	
 	}
 }   
